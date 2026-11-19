@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Spendwise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Spendwise</h1>
+  <p>Add your daily spending and see the total.</p>
+
+  <input type="number" id="amount" placeholder="Amount">
+  <input type="text" id="category" placeholder="Category (food, travel...)">
+  <button id="addBtn">Add</button>
+
+  <h2>Total: ₹<span id="total">0</span></h2>
+
+  <h3>Your spendings</h3>
+  <ul id="list"></ul>
+
+  <script>
+    let spendings = JSON.parse(localStorage.getItem("spendings")) || [];
+
+    const amountBox = document.getElementById("amount");
+    const categoryBox = document.getElementById("category");
+    const addBtn = document.getElementById("addBtn");
+    const totalText = document.getElementById("total");
+    const listBox = document.getElementById("list");
+
+    function saveSpendings() {
+      localStorage.setItem("spendings", JSON.stringify(spendings));
+    }
+
+    function showSpendings() {
+      listBox.innerHTML = "";
+      let total = 0;
+
+      for (let i = 0; i < spendings.length; i++) {
+        total = total + spendings[i].amount;
+
+        const item = document.createElement("li");
+        item.innerText = spendings[i].category + " - ₹" + spendings[i].amount + " ";
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerText = "Delete";
+        deleteBtn.addEventListener("click", function () {
+          spendings.splice(i, 1);
+          saveSpendings();
+          showSpendings();
+        });
+
+        item.appendChild(deleteBtn);
+        listBox.appendChild(item);
+      }
+
+      totalText.innerText = total;
+    }
+
+    addBtn.addEventListener("click", function () {
+      const amount = Number(amountBox.value);
+      const category = categoryBox.value;
+
+      if (amount <= 0) {
+        alert("Please enter a valid amount");
+        return;
+      }
+
+      spendings.push({ amount: amount, category: category });
+
+      amountBox.value = "";
+      categoryBox.value = "";
+      saveSpendings();
+      showSpendings();
+    });
+
+    showSpendings();
+  </script>
+</body>
+</html>
